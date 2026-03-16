@@ -23,6 +23,9 @@ public final class AtollRPCClient: @unchecked Sendable {
     private var notchDismissalHandlers: [String: () -> Void] = [:]
     private let encoder = JSONEncoder()
     
+    /// Enable debug logging of requests and responses to stderr.
+    public var debugLogging = false
+    
     /// The bundle identifier used for authorization. Defaults to `Bundle.main.bundleIdentifier`.
     public var bundleIdentifier: String
     
@@ -306,6 +309,10 @@ public final class AtollRPCClient: @unchecked Sendable {
         guard let descriptorJSON = try JSONSerialization.jsonObject(with: descriptorData) as? [String: Any] else {
             throw AtollRPCError.invalidDescriptor(reason: "Failed to serialize descriptor")
         }
+        if debugLogging {
+            let jsonStr = String(data: descriptorData, encoding: .utf8) ?? "<binary>"
+            print("[AtollRPC] \(method) → \(jsonStr.prefix(500))")
+        }
         let params = AnyCodable(["descriptor": descriptorJSON])
         let response = try await connectionManager.sendRequest(method: method, params: params)
         try checkError(response)
@@ -313,6 +320,9 @@ public final class AtollRPCClient: @unchecked Sendable {
     
     private func checkError(_ response: JSONRPCResponse) throws {
         if let error = response.error {
+            if debugLogging {
+                print("[AtollRPC] Error: code=\(error.code) message=\(error.message)")
+            }
             throw AtollRPCError.rpcError(
                 code: error.code,
                 message: error.message,

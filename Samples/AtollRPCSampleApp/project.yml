@@ -1,0 +1,25 @@
+name: AtollRPCSampleApp
+options:
+  deploymentTarget:
+    macOS: "13.0"
+schemes:
+  AtollRPCSampleApp:
+    build:
+      targets:
+        AtollRPCSampleApp: all
+targets:
+  AtollRPCSampleApp:
+    type: application
+    platform: macOS
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.example.AtollRPCSampleApp
+      CODE_SIGN_STYLE: Automatic
+    sources:
+      - path: Sources/App
+    info:
+      path: Supporting/Info.plist
+    dependencies:
+      - package: AtollRPC
+packages:
+  AtollRPC:
+    path: ../..
