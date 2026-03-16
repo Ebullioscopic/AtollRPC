@@ -4,3 +4,8 @@ Package.resolved
 *.xcodeproj/
 xcuserdata/
 .DS_Store
+DerivedData/
+.vscode/
+.idea/
+*.xcworkspace/xcuserdata/
+Samples/**/DerivedData/
