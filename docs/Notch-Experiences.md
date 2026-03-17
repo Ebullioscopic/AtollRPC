@@ -159,7 +159,7 @@ webContent: AtollWidgetWebContentDescriptor(
 )
 ```
 
-> **Security:** `allowLocalhostRequests` defaults to `false`. Only enable it if your web content needs to fetch data from a local server.
+> **Security:** `allowLocalhostRequests` defaults to `false` (for localhost/127.0.0.1 only) and `allowRemoteRequests` defaults to `false` (for external hosts/CDNs). Enable either one only when required.
 
 ## Update & Dismiss
 
