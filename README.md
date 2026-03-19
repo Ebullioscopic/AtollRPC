@@ -1,5 +1,9 @@
 # AtollRPC
 
+[![Swift](https://img.shields.io/badge/Swift-6.2-orange.svg)](https://swift.org)
+[![Platform](https://img.shields.io/badge/Platform-macOS%2013.0+-lightgrey.svg)](https://www.apple.com/macos/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A Swift SDK for third-party macOS apps to display **live activities**, **lock screen widgets**, and **notch experiences** in [Atoll](https://github.com/Ebullioscopic/Atoll) via JSON-RPC over WebSocket.
 
 <p align="center">
