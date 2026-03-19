@@ -106,6 +106,18 @@ AtollRPC communicates with Atoll over **JSON-RPC 2.0** on a **WebSocket** connec
 └──────────────┘                 └─────────────┘
 ```
 
+## Wire Compatibility Notes
+
+AtollRPC normalizes descriptor payloads before sending JSON-RPC requests to match
+Atoll's Codable decoding expectations.
+
+- `AtollLiveActivityPriority` is serialized as string values: `low`, `normal`, `high`, `critical`.
+- Color channels (`red`, `green`, `blue`, `alpha`) are serialized as numeric values.
+- Size dictionaries (`{ "width": ..., "height": ... }`) are normalized for host compatibility.
+- Missing top-level descriptor metadata is normalized to `{}`.
+
+These guarantees are applied automatically by the SDK.
+
 ## Error Handling
 
 ```swift

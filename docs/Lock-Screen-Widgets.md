@@ -96,9 +96,13 @@ position: AtollWidgetPosition(
     html: "<html>...</html>",
     preferredHeight: 140,
     isTransparent: true,
-    allowLocalhostRequests: false
+    allowLocalhostRequests: false,
+    allowRemoteRequests: false
 ))
 ```
+
+Use `allowLocalhostRequests` only for localhost/127.0.0.1 development servers and
+`allowRemoteRequests` only when external hosts (for example CDN assets) are required.
 
 ## Appearance Options
 

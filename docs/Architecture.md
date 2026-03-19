@@ -144,6 +144,18 @@ All communication uses [JSON-RPC 2.0](https://www.jsonrpc.org/specification):
 | Max reconnect attempts | 5 |
 | Reconnect strategy | Exponential backoff (1s, 2s, 4s, 8s, 16s) |
 
+## Payload Normalization
+
+Before sending a descriptor, AtollRPC applies compatibility normalization to align
+Swift model encoding with Atoll's decoder expectations:
+
+- Priority is emitted as string enum values (`low`, `normal`, `high`, `critical`).
+- Numeric color channels remain numeric (not boolean-coerced).
+- Size dictionaries are normalized for host-side Codable compatibility.
+- Missing descriptor metadata is emitted as an empty object.
+
+This is automatic and does not require app-side configuration.
+
 ## Comparison with AtollExtensionKit (XPC)
 
 | Feature | AtollExtensionKit | AtollRPC |

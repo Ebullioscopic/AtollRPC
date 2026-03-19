@@ -17,12 +17,14 @@ try await client.presentLiveActivity(activity)
 
 ## Priority Levels
 
-| Priority | Value | Behavior |
-|----------|-------|----------|
-| `.low` | 0 | Yields to other activities |
-| `.normal` | 1 | Default priority |
-| `.high` | 2 | Takes precedence over normal activities |
-| `.critical` | 3 | Always shown, even over high-priority content |
+| Priority | Wire Value | Behavior |
+|----------|------------|----------|
+| `.low` | `"low"` | Yields to other activities |
+| `.normal` | `"normal"` | Default priority |
+| `.high` | `"high"` | Takes precedence over normal activities |
+| `.critical` | `"critical"` | Always shown, even over high-priority content |
+
+AtollRPC serializes priority as string values on the wire to match Atoll's JSON-RPC decoder.
 
 ## Leading Icons
 
