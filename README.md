@@ -2,7 +2,11 @@
 
 A Swift SDK for third-party macOS apps to display **live activities**, **lock screen widgets**, and **notch experiences** in [Atoll](https://github.com/Ebullioscopic/Atoll) via JSON-RPC over WebSocket.
 
-Unlike [AtollExtensionKit](https://github.com/Ebullioscopic/AtollExtensionKit) (which uses XPC and requires matching bundle IDs), AtollRPC allows **any** application to communicate with Atoll.
+<p align="center">
+    <img src=".github/assets/AtollRPC.png" alt="AtollRPC" width="180">
+</p>
+
+Unlike [AtollExtensionKit](https://github.com/Ebullioscopic/AtollExtensionKit) (which uses XPC and requires matching bundle IDs, making it not ideal for App Store), AtollRPC allows **any** application to communicate with Atoll, while being App Store safe.
 
 ## Requirements
 
