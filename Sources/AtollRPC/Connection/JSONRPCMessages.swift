@@ -82,6 +82,14 @@ struct AnyCodable: Codable, @unchecked Sendable {
         switch value {
         case is NSNull:
             try container.encodeNil()
+        case let number as NSNumber:
+            // JSONSerialization surfaces numeric values as NSNumber.
+            // Preserve numeric channels (e.g. color 0/1) as numbers, not booleans.
+            if CFGetTypeID(number) == CFBooleanGetTypeID() {
+                try container.encode(number.boolValue)
+            } else {
+                try container.encode(number.doubleValue)
+            }
         case let bool as Bool:
             try container.encode(bool)
         case let int as Int:

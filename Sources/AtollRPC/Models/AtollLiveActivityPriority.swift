@@ -8,13 +8,22 @@
 import Foundation
 
 /// Priority level for live activities.
-public enum AtollLiveActivityPriority: Int, Codable, Sendable, Hashable, Comparable {
-    case low = 0
-    case normal = 1
-    case high = 2
-    case critical = 3
+public enum AtollLiveActivityPriority: String, Codable, Sendable, Hashable, Comparable {
+    case low
+    case normal
+    case high
+    case critical
     
     public static func < (lhs: AtollLiveActivityPriority, rhs: AtollLiveActivityPriority) -> Bool {
-        lhs.rawValue < rhs.rawValue
+        lhs.rawPriority < rhs.rawPriority
+    }
+
+    private var rawPriority: Int {
+        switch self {
+        case .low: return 0
+        case .normal: return 1
+        case .high: return 2
+        case .critical: return 3
+        }
     }
 }

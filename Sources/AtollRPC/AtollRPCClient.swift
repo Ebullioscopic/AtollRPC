@@ -309,11 +309,12 @@ public final class AtollRPCClient: @unchecked Sendable {
         guard let descriptorJSON = try JSONSerialization.jsonObject(with: descriptorData) as? [String: Any] else {
             throw AtollRPCError.invalidDescriptor(reason: "Failed to serialize descriptor")
         }
+        let normalizedDescriptor = RPCPayloadNormalizer.normalizeDescriptor(descriptorJSON)
         if debugLogging {
             let jsonStr = String(data: descriptorData, encoding: .utf8) ?? "<binary>"
             print("[AtollRPC] \(method) → \(jsonStr.prefix(500))")
         }
-        let params = AnyCodable(["descriptor": descriptorJSON])
+        let params = AnyCodable(["descriptor": normalizedDescriptor])
         let response = try await connectionManager.sendRequest(method: method, params: params)
         try checkError(response)
     }
