@@ -8,6 +8,7 @@ struct ContentView: View {
     @State private var isConnected = false
     @State private var isAuthorized = false
     @State private var status = "Idle"
+    @State private var atollLifecycleState: AtollLifecycleState = .idle
 
     @State private var demoProgress: Double = 0.35
     @State private var flightProgress: Double = 0.12
@@ -46,6 +47,10 @@ struct ContentView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
 
+                Text("Atoll lifecycle: \(atollLifecycleState.rawValue)")
+                    .font(.caption)
+                    .foregroundColor(atollLifecycleState == .active ? .green : .orange)
+
                 Divider()
 
                 connectionSection
@@ -72,6 +77,14 @@ struct ContentView: View {
     // MARK: - Callbacks
 
     private func registerCallbacks() {
+        client.onAtollLifecycleChange { state in
+            Task { @MainActor in
+                self.atollLifecycleState = state
+                self.isConnected = (state == .active)
+                self.status = state == .active ? "Atoll became active" : "Atoll became idle"
+            }
+        }
+
         client.onAuthorizationChange { authorized in
             Task { @MainActor in
                 self.isAuthorized = authorized
@@ -122,6 +135,12 @@ struct ContentView: View {
                 Text(isAuthorized ? "✅ Authorized" : "❌ Not Authorized")
                     .font(.caption)
                     .foregroundColor(isAuthorized ? .green : .red)
+
+                if atollLifecycleState == .idle {
+                    Text("Atoll is idle. Start Atoll to enable demo actions.")
+                        .font(.caption)
+                        .foregroundColor(.orange)
+                }
             }
             .frame(maxWidth: .infinity)
         }
@@ -188,7 +207,7 @@ struct ContentView: View {
                 .foregroundColor(.red)
             }
             .frame(maxWidth: .infinity)
-            .disabled(!isAuthorized)
+            .disabled(!isAuthorized || atollLifecycleState == .idle)
         }
     }
 
@@ -225,7 +244,7 @@ struct ContentView: View {
                 .foregroundColor(.red)
             }
             .frame(maxWidth: .infinity)
-            .disabled(!isAuthorized)
+            .disabled(!isAuthorized || atollLifecycleState == .idle)
         }
     }
 
@@ -270,7 +289,7 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity)
-            .disabled(!isAuthorized)
+            .disabled(!isAuthorized || atollLifecycleState == .idle)
         }
     }
 

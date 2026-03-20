@@ -75,6 +75,7 @@ if authorized {
 | `requestAuthorization()` | Request user authorization |
 | `checkAuthorization()` | Check current authorization status |
 | `onAuthorizationChange(_:)` | Register callback for authorization changes |
+| `onAtollLifecycleChange(emitCurrentState:_:)` | Register callback for Atoll active/idle lifecycle changes |
 
 ### Live Activities
 
@@ -144,6 +145,24 @@ do {
     }
 }
 ```
+
+    ## Lifecycle Notifications
+
+    Atoll publishes distributed lifecycle notifications when it launches and quits.
+    AtollRPC surfaces this through a callback API:
+
+    ```swift
+    client.onAtollLifecycleChange { state in
+        switch state {
+        case .active:
+            // Atoll started and is ready
+            break
+        case .idle:
+            // Atoll quit; move your app to idle mode
+            break
+        }
+    }
+    ```
 
 ## License
 

@@ -5,6 +5,7 @@
 //  Main client interface for third-party apps to communicate with Atoll via JSON-RPC WebSocket.
 //
 
+import AppKit
 import Foundation
 
 /// Main client class for interacting with Atoll via JSON-RPC over WebSocket.
@@ -21,7 +22,15 @@ public final class AtollRPCClient: @unchecked Sendable {
     private var activityDismissalHandlers: [String: () -> Void] = [:]
     private var widgetDismissalHandlers: [String: () -> Void] = [:]
     private var notchDismissalHandlers: [String: () -> Void] = [:]
+    private var lifecycleCallbacks: [(AtollLifecycleState) -> Void] = []
     private let encoder = JSONEncoder()
+
+    private static let atollBundleIdentifiers = [
+        "com.ebullioscopic.Atoll",
+        "com.Ebullioscopic.Atoll",
+        "com.ebullioscopic.Atoll.dev",
+        "com.Ebullioscopic.Atoll.dev"
+    ]
     
     /// Enable debug logging of requests and responses to stderr.
     public var debugLogging = false
@@ -42,6 +51,7 @@ public final class AtollRPCClient: @unchecked Sendable {
         self.connectionManager = RPCWebSocketManager(host: host, port: port)
         self.bundleIdentifier = bundleIdentifier ?? Bundle.main.bundleIdentifier ?? "unknown"
         setupNotificationHandlers()
+        setupLifecycleObservers()
     }
     
     // MARK: - Connection
@@ -124,6 +134,24 @@ public final class AtollRPCClient: @unchecked Sendable {
     /// Register a callback for authorization status changes.
     public func onAuthorizationChange(_ callback: @escaping (Bool) -> Void) {
         authorizationCallbacks.append(callback)
+    }
+
+    /// Register a callback for Atoll lifecycle changes.
+    ///
+    /// - Parameters:
+    ///   - emitCurrentState: Reserved for API parity; current state emission is not available without observing transitions.
+    ///   - callback: Invoked when Atoll becomes active or idle.
+    public func onAtollLifecycleChange(emitCurrentState: Bool = true, _ callback: @escaping (AtollLifecycleState) -> Void) {
+        lifecycleCallbacks.append(callback)
+        if emitCurrentState {
+            callback(isAtollRunning ? .active : .idle)
+        }
+    }
+
+    private var isAtollRunning: Bool {
+        Self.atollBundleIdentifiers.contains {
+            !NSRunningApplication.runningApplications(withBundleIdentifier: $0).isEmpty
+        }
     }
     
     // MARK: - Live Activities
@@ -264,6 +292,34 @@ public final class AtollRPCClient: @unchecked Sendable {
             }
         }
     }
+
+    private func setupLifecycleObservers() {
+        let center = DistributedNotificationCenter.default()
+        center.addObserver(self,
+                           selector: #selector(handleAtollDidBecomeActive(_:)),
+                           name: AtollLifecycleNotification.didBecomeActive,
+                           object: nil)
+        center.addObserver(self,
+                           selector: #selector(handleAtollDidBecomeIdle(_:)),
+                           name: AtollLifecycleNotification.didBecomeIdle,
+                           object: nil)
+    }
+
+    private func notifyLifecycleCallbacks(state: AtollLifecycleState) {
+        lifecycleCallbacks.forEach { $0(state) }
+    }
+
+    @objc nonisolated private func handleAtollDidBecomeActive(_ notification: Notification) {
+        Task { @MainActor in
+            self.notifyLifecycleCallbacks(state: .active)
+        }
+    }
+
+    @objc nonisolated private func handleAtollDidBecomeIdle(_ notification: Notification) {
+        Task { @MainActor in
+            self.notifyLifecycleCallbacks(state: .idle)
+        }
+    }
     
     private func handleNotification(method: String, params: AnyCodable?) {
         guard let dict = params?.dictionary else { return }
@@ -345,5 +401,9 @@ public final class AtollRPCClient: @unchecked Sendable {
             }
         }
         return true
+    }
+
+    deinit {
+        DistributedNotificationCenter.default().removeObserver(self)
     }
 }

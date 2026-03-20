@@ -26,6 +26,22 @@ if client.isConnected {
 client.disconnect()
 ```
 
+### Atoll Lifecycle Callbacks
+
+Atoll emits distributed notifications when it launches and when it quits.
+Use `onAtollLifecycleChange` to react to active/idle transitions:
+
+```swift
+client.onAtollLifecycleChange { state in
+    switch state {
+    case .active:
+        print("Atoll became active")
+    case .idle:
+        print("Atoll became idle")
+    }
+}
+```
+
 ### Auto-Reconnect
 
 The client automatically reconnects with **exponential backoff** if the connection drops:
